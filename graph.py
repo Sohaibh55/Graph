@@ -1,49 +1,67 @@
+from collections import deque
+import heapq
 
-import queue
-class graph :
-    def __init__(self,size):
-        self.graph = [ [ 0 for _ in range(size)] for _ in range(size) ]
-    def insert(self,u,v,distance,allow):
-        assert 0 <= u < len(self.graph) and  0 <= v <len(self.graph), " Error : Invalid index "
-        self.graph[u][v] = distance
-        if allow :
-            self.graph[v][u] = distance
-    def display(self):
-        for i in  range(len(self.graph)) :
-           print(f"{i} : ",end="")
-           for j in  range(len(self.graph)) :
-               if  self.graph[i][j] != 0 :
-                   print(f" ( {j},{self.graph[i][j]} ) ",end='')
-           print()
-    def BFS(self,start_index):
-        vertex_index = [True if _ == start_index  else False for _ in range(len(self.graph)) ]
-        Queue = queue.Queue()
-        Queue.put(start_index)
-        print(f"BFS traversal starting from node {start_index} : ",end="")
-        while not Queue.empty() :
+class Graph:
+    def __init__(self, size):
 
-            start_index = Queue.get()
-            print(start_index,end=" ")
+        self.graph = [[] for _ in range(size)]
 
-            for i in range(len(self.graph)) :
-                if not vertex_index[i] and self.graph[start_index][i]:
-                    Queue.put(i)
-                    vertex_index[i] = True
+    def add_edge(self, u, v, distance, bidirectional=True):
+
+        self.graph[u].append((v, distance))
+        if bidirectional:
+            self.graph[v].append((u, distance))
+
+    def bfs(self, start_index):
+        visited_index = [False] * len(self.graph)
+        queue = deque([start_index])
+        visited_index[start_index] = True
+
+        print(f"BFS traversal starting from node {start_index}: ", end="")
+        while queue:
+            current = queue.popleft()
+            print(current, end=" ")
+
+            for neighbor, _ in self.graph[current]:
+                if not visited_index[neighbor]:
+                    queue.append(neighbor)
+                    visited_index[neighbor] = True
         print()
 
-    def  DFS_REC(self,visited_state,start_index) :
-          print(start_index,end=' ')
-          visited_state[start_index] = True
+    def rec_dfs(self, visited_state, start_index):
+        print(start_index, end=" ")
+        visited_state[start_index] = True
 
-          for i in range(len(self.graph)):
-              if not visited_state[i] and self.graph[start_index][i] != 0:
-                 self.DFS_REC(visited_state, i)
+        for neighbor, _ in self.graph[start_index]:
+            if not visited_state[neighbor]:
+                self.rec_dfs(visited_state, neighbor)
 
-    def DFS(self):
+    def dfs(self):
         visited_state = [False] * len(self.graph)
-        print("DFS Traversal : ",end='')
-
-        for i in range(len(self.graph)) :
-            if not visited_state[i] :
-              self.DFS_REC(visited_state,i)
+        print("DFS Traversal: ", end="")
+        for i in range(len(self.graph)):
+            if not visited_state[i]:
+                self.rec_dfs(visited_state, i)
         print()
+
+    def dijkstra(self, start_index):
+        distances = [float('inf')] * len(self.graph)
+        distances[start_index] = 0
+        priority_queue = [(0, start_index)]  # (distance, vertex)
+
+        while priority_queue:
+            current_distance, current_vertex = heapq.heappop(priority_queue)
+
+            if current_distance > distances[current_vertex]:
+                continue
+
+            for neighbor, weight in self.graph[current_vertex]:
+                distance = current_distance + weight
+                if distance < distances[neighbor]:
+                    distances[neighbor] = distance
+                    heapq.heappush(priority_queue, (distance, neighbor))
+
+        print(f"Shortest distances from node {start_index}:")
+        for i, d in enumerate(distances):
+            print(f"Node {i} : Distance {d}")
+
