@@ -29,5 +29,21 @@ class graph :
                 if not vertex_index[i] and self.graph[start_index][i]:
                     Queue.put(i)
                     vertex_index[i] = True
+        print()
 
+    def  DFS_REC(self,visited_state,start_index) :
+          print(start_index,end=' ')
+          visited_state[start_index] = True
 
+          for i in range(len(self.graph)):
+              if not visited_state[i] and self.graph[start_index][i] != 0:
+                 self.DFS_REC(visited_state, i)
+
+    def DFS(self):
+        visited_state = [False] * len(self.graph)
+        print("DFS Traversal : ",end='')
+
+        for i in range(len(self.graph)) :
+            if not visited_state[i] :
+              self.DFS_REC(visited_state,i)
+        print()

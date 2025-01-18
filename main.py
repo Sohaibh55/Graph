@@ -16,3 +16,5 @@ Graph.insert(4, 3, 15, True)
 Graph.display()
 
 Graph.BFS(3)
+
+Graph.DFS()
